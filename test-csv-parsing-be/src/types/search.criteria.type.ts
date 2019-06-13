@@ -1,13 +1,11 @@
-import { IsNotEmpty, IsString, IsDefined } from 'class-validator';
+import { IsArray, ArrayNotEmpty } from 'class-validator';
 
 export class SearchCriteria {
-  @IsNotEmpty()
-  @IsDefined()
-  @IsString({ each: true })
-  country: string[];
+  @IsArray()
+  @ArrayNotEmpty()
+  countries: string[];
 
-  @IsNotEmpty()
-  @IsDefined()
-  @IsString({ each: true })
-  device: string[];
+  @IsArray()
+  @ArrayNotEmpty()
+  devices: string[];
 }
