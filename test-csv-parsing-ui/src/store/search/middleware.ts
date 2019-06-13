@@ -13,9 +13,7 @@ import {
   searchError,
   searchSuccess,
   ISearch,
-  ISearchSuccess,
 } from './actions';
-import { ISearchResult } from '../../types/ISearchResult';
 
 export const fetchDeviceOptions: Epic<any> = (
   action$,

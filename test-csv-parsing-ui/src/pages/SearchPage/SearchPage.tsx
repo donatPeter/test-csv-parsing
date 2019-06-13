@@ -1,9 +1,7 @@
 import * as React from 'react';
 import {
-  Field,
   Form,
   Formik,
-  FormikErrors,
 } from 'formik';
 
 import { FormGroup } from '../../components/FormGroup/FormGroup'
@@ -55,8 +53,8 @@ export class SearchPageBase extends React.Component<IProps> {
         <h3>Please choose at least one country and device in order to be able to fetch the results</h3>
         <Formik
           initialValues={{
-            countries: testerCountries,
-            devices: deviceOptions,
+            countries: [],
+            devices: [],
           }}
           onSubmit={this.submit}
         >
@@ -65,23 +63,38 @@ export class SearchPageBase extends React.Component<IProps> {
               <h2> Countries: </h2>
               {testerCountries.map(country =>
                 <div key={country}>
-                  <input type="checkbox" id={country} name={country} value={country} onClick={this.handleCountryChange} />
+                  <input
+                    checked={this.state.selectedCountries.includes(country)}
+                    type="checkbox"
+                    id={country}
+                    name={country}
+                    onChange={this.handleCountryChange} />
                   <label htmlFor={country}>{country}</label>
-                </div>)}
+                </div>
+              )}
             </FormGroup>
             <FormGroup>
               <h2> Devices: </h2>
               {deviceOptions.map(device =>
                 <div key={device}>
-                  <input type="checkbox" id={device} name={device} value={device} onClick={this.handleDeviceChange} />
+                  <input
+                    type="checkbox"
+                    checked={this.state.selectedDevices.includes(device)}
+                    id={device}
+                    name={device}
+                    onChange={this.handleDeviceChange} />
                   <label htmlFor={device}>{device}</label>
                 </div>)}
             </FormGroup>
-            <button type="submit" disabled={false}>
+            <button
+              onClick={this.submit}
+              disabled={this.isSubmitDisabled()}
+            >
               Submit
             </button>
           </Form>
         </Formik>
+        <h2> Results: </h2>
         <ul>
           {searchResults.map(({ firstName, lastName, experience }) =>
             <li key={firstName}>{firstName} {lastName} ({experience})</li>
@@ -101,9 +114,20 @@ export class SearchPageBase extends React.Component<IProps> {
 
     let newSelectedValues = [...this.state[name]];
     if (selected) {
-      newSelectedValues.push(value)
+      if (value === 'ALL') {
+        newSelectedValues =
+          name === 'selectedCountries' ?
+            [...this.props.testerCountries] :
+            [...this.props.deviceOptions];
+      } else {
+        newSelectedValues.push(value)
+      }
     } else {
-      newSelectedValues = newSelectedValues.filter(item => item !== value);
+      if (value !== 'ALL') {
+        newSelectedValues = newSelectedValues.filter(item => item !== value && item !== 'ALL');
+      } else {
+        newSelectedValues = [];
+      }
     }
 
     this.setState({
@@ -116,5 +140,10 @@ export class SearchPageBase extends React.Component<IProps> {
       countries: [...this.state.selectedCountries],
       devices: [...this.state.selectedDevices]
     })
+  }
+
+  private isSubmitDisabled = () => {
+    const { selectedCountries, selectedDevices } = this.state;
+    return !(selectedCountries.length && selectedDevices.length)
   }
 }
